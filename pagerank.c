@@ -40,7 +40,7 @@ int PageRank(int d, int diffPR, int maxIterations) {
     int URLs[];
     int i;
     int URLcount = 0;
-
+    URL newDLList();
     collection = fopen ("collection.txt", "r");
     for (i = 0;; i++) {
         URL[i] = fgetc(collection);
@@ -74,7 +74,7 @@ int PageRank(int d, int diffPR, int maxIterations) {
                     break;
                 }
             }
-            
+
             /*       For each url pi in the collection */
             int PR_old = pR[i];
             sum = 0 ;

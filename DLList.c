@@ -210,6 +210,33 @@ void DLListBefore(DLList L, char *it)
 {
 	assert(L != NULL); 
 	// COMPLETE THIS FUNCTION
+	//DLListNode *newNode = malloc(sizeof(DLListNode));
+	//newNode->value = it;
+	DLListNode *newNode = newDLListNode(it);
+
+	if (L->nitems == 0) {
+		// if list is empty
+		//printf("case 1\n");
+		L->first = newNode;
+		L->last = newNode;
+		L->curr = newNode;
+		newNode->prev = NULL;
+		newNode->next = NULL;
+	} else if (L->curr == L->first) {
+		//printf("case 2\n");
+		newNode->next = L->curr;
+		newNode->prev = NULL;
+		L->first = newNode;
+		L->curr->prev = newNode;
+	} else {
+		//printf("case 3\n");
+		newNode->next = L->curr;
+		newNode->prev = L->curr->prev;
+		L->curr->prev = newNode;
+		newNode->prev->next = newNode;
+	}
+	L->nitems++;
+	L->curr = newNode;
 }
 
 // insert an item after current item
@@ -217,7 +244,31 @@ void DLListBefore(DLList L, char *it)
 void DLListAfter(DLList L, char *it)
 {
 	assert(L != NULL); 
-	// COMPLETE THIS FUNCTION
+
+	DLListNode *newNode = malloc(sizeof(DLListNode));
+	newNode->value = it;
+	if (L->nitems == 0) {
+		//printf("case 1\n");
+		L->first = newNode;
+		L->last = newNode;
+		L->curr = newNode;
+		newNode->prev = NULL;
+		newNode->next = NULL;
+	} else if (L->curr == L->last) {
+		//printf("case 2\n");
+		newNode->next = NULL;
+		newNode->prev = L->curr;
+		L->last = newNode;
+		L->curr->next = newNode;
+	} else {
+		//printf("case 1\n");
+		newNode->next = L->curr->next;
+		newNode->prev = L->curr;
+		L->curr->next = newNode;
+		newNode->next->prev = newNode;
+	}
+	L->nitems++;
+	L->curr = newNode;
 }
 
 // delete current item
@@ -226,8 +277,25 @@ void DLListAfter(DLList L, char *it)
 // if current was only item, current becomes null
 void DLListDelete(DLList L)
 {
-	assert (L != NULL);
-	// COMPLETE THIS FUNCTION
+	assert(L != NULL);
+	if (L->curr == L->last) {
+		L->last = L->curr->prev;
+		free(L->curr);
+		L->curr = L->last;
+		L->last = NULL;
+	} else if (L->curr == L->first) {
+		L->first = L->curr->next;
+		free(L->curr);
+		L->curr = L->first;
+		L->first = NULL;
+	} else {
+		L->curr->prev->next = L->curr->next;
+		L->curr->next->prev = L->curr->prev;
+		DLListNode *tempNode = L->curr->next;
+		free(L->curr);
+		L->curr = tempNode;
+	}
+	L->nitems--;
 }
 
 // return number of elements in a list
