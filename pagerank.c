@@ -24,6 +24,7 @@ PageRank(d, diffPR, maxIterations)
 #include <stdlib.h>
 #include <stdio.h>
 #include "Graph.h"
+#include "DLList.h"
 
 int main (int argc, const char * argv[]) {
 
@@ -31,6 +32,7 @@ int main (int argc, const char * argv[]) {
 
     return EXIT_SUCCESS;
 }
+//****** switch to linked list
 
 int PageRank(int d, int diffPR, int maxIterations) {
 
@@ -46,7 +48,7 @@ int PageRank(int d, int diffPR, int maxIterations) {
         if (feof(collection)) {
             break;
         }
-        printf("%c", collection);
+        //printf("%c", collection);
     }
     fclose(collection);
     Graph webPages = newGraph(URLcount);
@@ -62,9 +64,17 @@ int PageRank(int d, int diffPR, int maxIterations) {
         while (i = 0; i < URLcount; i++) {
             char outgoingURL[0x100];
 
-            snprintf(buf, sizeof(buf), "%s.txt", URL[i]);
-            FILE *f = fopen(buf, "r");
-            //outGoingUrls = fopen ("%d.txt", "r", URL[i]);
+            snprintf(buf, sizeof(outgoingURL), "%s.txt", URL[i]);
+            FILE *f = fopen(outgoingURL, "r");
+            int j;
+            int oURLs[];
+            for (j = 0;; j++) {
+                oURL[j] = fgetc(outgoingURL);
+                if (feof(collection)) {
+                    break;
+                }
+            }
+            
             /*       For each url pi in the collection */
             int PR_old = pR[i];
             sum = 0 ;
