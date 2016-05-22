@@ -22,10 +22,15 @@ void freeDLList(DLList);
 
 // create an DLList by reading items from a file
 // assume that the file is open for reading
-DLList getDLList(FILE *);
+//DLList getDLList(FILE *);
 
 // display list on output, one item per line
-void showDLList(FILE *, DLList);
+void showDLList(DLList);
+
+//change pagerank
+DLList alterPageRank (DLList, double);
+
+//get pagerank
 
 // check sanity of a DLList (for testing)
 int validDLList(DLList);
@@ -43,11 +48,11 @@ int DLListMoveTo(DLList, int);
 
 // insert an item before current item
 // new item becomes current item
-void DLListBefore(DLList, char *);
+void DLListBefore(DLList, char *, double);
 
 // insert an item after current item
 // new item becomes current item
-void DLListAfter(DLList, char *);
+void DLListAfter(DLList, char *, double);
 
 // delete current item
 // new item becomes item following current
