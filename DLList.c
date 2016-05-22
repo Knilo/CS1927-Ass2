@@ -11,7 +11,8 @@
 // data structures representing DLList
 
 typedef struct DLListNode {
-	char   *value;  // value of this list item (string)
+	char   *urlname;  // urlname of this list item (string)
+	double    pagerank; //pagerank value
 	struct DLListNode *prev;
 	               // pointer previous node in list
 	struct DLListNode *next;
@@ -26,14 +27,24 @@ typedef struct DLListRep {
 } DLListRep;
 
 // create a new DLListNode (private function)
-static DLListNode *newDLListNode(char *it)
+static DLListNode *newDLListNode(char *it, double pr)
 {
 	DLListNode *new;
 	new = malloc(sizeof(DLListNode));
 	assert(new != NULL);
-	new->value = strdup(it);
+	new->urlname = strdup(it);
+	new->pagerank = pr;
 	new->prev = new->next = NULL;
 	return new;
+}
+
+//alter pagerank
+DLList alterPageRank (DLList L, double pr) {
+	assert(L != NULL);
+	assert(L->curr != NULL);
+	L->curr->pagerank = pr;
+	return L;
+
 }
 
 // create a new empty DLList
@@ -67,17 +78,17 @@ void freeDLList(DLList L)
 // trim off \n from strings (private function)
 // this is needed for getDLList() because of fgets()
 // alternatively, we could use the evil gets() function
-static char *trim(char *s)
+/*static char *trim(char *s)
 {
 	int end = strlen(s)-1;
 	if (s[end] == '\n') s[end] = '\0';
 	return s;
-}
+}*/
 
 // create an DLList by reading items from a file
 // assume that the file is open for reading
 // assume one item per line, line < 999 chars
-DLList getDLList(FILE *in)
+/*DLList getDLList(FILE *in)
 {
 	DLList L;
 	DLListNode *new;
@@ -85,8 +96,8 @@ DLList getDLList(FILE *in)
 
 	L = newDLList();
 	while (fgets(line,1000,in) != NULL) {
-		char *value = strdup(trim(line));
-		new = newDLListNode(value);
+		char *urlname = strdup(trim(line));
+		//new = newDLListNode(urlname, pr);
 		if (L->last == NULL) {
 			L->first = L->last = new;
 		}
@@ -99,15 +110,15 @@ DLList getDLList(FILE *in)
 	}	
 	L->curr = L->first;
 	return L;
-}
+}*/
 
 // display items from a DLList, one per line
-void showDLList(FILE *out, DLList L)
+void showDLList(DLList L)
 {
-	assert(out != NULL); assert(L != NULL);
+	assert(L != NULL);
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		fprintf(out,"%s\n",curr->value);
+		printf("name :%s, pagerank :%f\n",curr->urlname, curr->pagerank);
 }
 
 // check sanity of a DLList (for testing)
@@ -137,11 +148,11 @@ int validDLList(DLList L)
 	count = 0;
 	for (curr = L->first; curr != NULL; curr = curr->next) {
 		if (curr->prev != NULL && curr->prev->next != curr) {
-			fprintf(stderr, "Invalid forward link into node (%s)\n",curr->value);
+			fprintf(stderr, "Invalid forward link into node (%s)\n",curr->urlname);
 			return 0;
 		}
 		if (curr->next != NULL && curr->next->prev != curr) {
-			fprintf(stderr, "Invalid backward link into node (%s)\n",curr->value);
+			fprintf(stderr, "Invalid backward link into node (%s)\n",curr->urlname);
 			return 0;
 		}
 		count++;
@@ -169,7 +180,7 @@ int validDLList(DLList L)
 char *DLListCurrent(DLList L)
 {
 	assert(L != NULL); assert(L->curr != NULL);
-	return L->curr->value;
+	return L->curr->urlname;
 }
 
 // move current position (+ve forward, -ve backward)
@@ -206,13 +217,13 @@ int DLListMoveTo(DLList L, int i)
 
 // insert an item before current item
 // new item becomes current item
-void DLListBefore(DLList L, char *it)
+void DLListBefore(DLList L, char *it, double pr)
 {
 	assert(L != NULL); 
 	// COMPLETE THIS FUNCTION
 	//DLListNode *newNode = malloc(sizeof(DLListNode));
-	//newNode->value = it;
-	DLListNode *newNode = newDLListNode(it);
+	//newNode->urlname = it;
+	DLListNode *newNode = newDLListNode(it, pr);
 
 	if (L->nitems == 0) {
 		// if list is empty
@@ -241,36 +252,30 @@ void DLListBefore(DLList L, char *it)
 
 // insert an item after current item
 // new item becomes current item
-void DLListAfter(DLList L, char *it)
+void DLListAfter(DLList L, char *it, double pr) 
 {
-	assert(L != NULL); 
-
-	DLListNode *newNode = malloc(sizeof(DLListNode));
-	newNode->value = it;
+	assert(L != NULL);
 	if (L->nitems == 0) {
-		//printf("case 1\n");
-		L->first = newNode;
-		L->last = newNode;
-		L->curr = newNode;
-		newNode->prev = NULL;
-		newNode->next = NULL;
-	} else if (L->curr == L->last) {
-		//printf("case 2\n");
-		newNode->next = NULL;
-		newNode->prev = L->curr;
-		L->last = newNode;
-		L->curr->next = newNode;
+		DLListNode *new = newDLListNode(it, pr);
+		L->first = new;
+		L->last = new;
+		L->curr = new;
 	} else {
-		//printf("case 1\n");
-		newNode->next = L->curr->next;
-		newNode->prev = L->curr;
-		L->curr->next = newNode;
-		newNode->next->prev = newNode;
-	}
-	L->nitems++;
-	L->curr = newNode;
-}
+		DLListNode *temp = L->curr->next;
+		DLListNode *new = newDLListNode(it, pr);
+		new->prev = L->curr;
+		L->curr->next = new;
 
+		if (L->curr == L->last) {
+			L->last = new;
+		} else {
+			temp->prev = new;
+		}
+		new->next = temp;
+		L->curr = new;
+	}
+	L->nitems ++;
+}
 // delete current item
 // new item becomes item following current
 // if current was last, current becomes new last
