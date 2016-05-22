@@ -31,6 +31,7 @@ void showDLList(DLList);
 DLList alterPageRank (DLList, double);
 
 //get pagerank
+double getPageRank (DLList);
 
 // check sanity of a DLList (for testing)
 int validDLList(DLList);
