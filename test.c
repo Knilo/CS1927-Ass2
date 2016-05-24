@@ -98,70 +98,102 @@ int main (int argc, const char * argv[]) {
 //********** currently working on (all above works) **************
     int iteration;
     int maxIterations = 100;
-    //double diffPR = 0.00001;
-    //double diff = 0;
+    double diffPR = 0.00001;
+    double diff = 100;
     char * checkingFrom;
     char * checkingTo;
     int connections = 0;
+    double connectionsFrom = 0;
     int j = 0;
     double d = 0.85;
     double initPageRank2[URLcount];
-    for (iteration = 0; iteration < maxIterations /*&&& diff >= diffPR*/; iteration ++) {
+    for (iteration = 0; iteration < maxIterations && diff >= diffPR; iteration ++) {
         //DLListMoveTo(URLs, 1);
         for (i = 0; i <= URLcount; i++) {
             initPageRank2[i] = getPageRank(URLs);
             DLListMoveTo(URLs, i + 1);
         }
-        //diff = 0;
+        diff = 0;
         //showGraph(webPages, 0); //FOR TESTING
         for (i = 0; i <= URLcount; i++) {
             connections = 0;
             DLListMoveTo(URLs, i + 1);
-            checkingFrom = DLListCurrent(URLs);
+            checkingTo = DLListCurrent(URLs);
+            //printf("checking to %s\n", checkingTo);
             j = 0;
             for (j = 0; j <= URLcount; j++) {
                 DLListMoveTo(URLs, j + 1);
-                checkingTo = DLListCurrent(URLs);
+                checkingFrom = DLListCurrent(URLs);
                 //check all out going links from checkingFrom, sum them, then add that value to pr of the checking to
-                connections = connections + isConnected(webPages, checkingFrom, checkingTo);
+                connections = connections + isConnected(webPages, checkingTo, checkingFrom);
             }
             //printf("isconnected?? %d\n", connections); //FOR TESTING
             if (connections > 0) {
+                double sum = 0;
                 DLListMoveTo(URLs, i + 1);
-                double originalPrfrom = getPageRank(URLs);
+                //double PRold = getPageRank(URLs);
                 //printf("originalPrfrom: %lf\n", originalPrfrom ); //FOR TESTING
                 for (j = 0; j <= URLcount; j++) {
                     DLListMoveTo(URLs, j + 1);
-                    checkingTo = DLListCurrent(URLs);
+                    checkingFrom = DLListCurrent(URLs);
                     //check all out going links from checkingFrom, sum them, then add that value to pr of the checking to
-                    if (isConnected(webPages, checkingFrom, checkingTo)) {
-                        double originalPrTo = getPageRank(URLs);
-                        if (originalPrTo == initPageRank2[i]) {
-                            alterPageRank (URLs, ((double)originalPrfrom / (double)connections));
-                        } else {
-                            //printf("name: %s, old pr: %lf\n", checkingTo, originalPrTo); //FOR TESTING
-                            alterPageRank (URLs, ((double)originalPrTo + ((double)originalPrfrom / (double)connections)));
+                    if (isConnected(webPages, checkingTo, checkingFrom)) {
+                        //double prFrom = getPageRank(URLs);
+
+                        DLListMoveTo(URLs, j + 1);
+                        char * countingTo = DLListCurrent(URLs);
+                        int l;
+                        for (l = 0; l <= URLcount; l++) {
+                            DLListMoveTo(URLs, l + 1);
+                            char * countingFrom = DLListCurrent(URLs);
+                            //check all out going links from checkingFrom, sum them, then add that value to pr of the checking to
+                            connectionsFrom = connectionsFrom + isConnected(webPages, countingTo, countingFrom);
                         }
-                        //double prToPrint = getPageRank(URLs); //FOR TESTING
-                        //printf("name: %s, new pr: %lf\n", checkingTo, prToPrint); //FOR TESTING
-                        //diff = diff + fabs(originalPrTo - getPageRank(URLs));
+                        sum = sum + (initPageRank2[j] / connectionsFrom);
+
                     }
+
                 }
+                DLListMoveTo(URLs, i + 1);
+                alterPageRank(URLs, sum);
+                printf("new prs\n");
+                showDLList(URLs);
             }
+
         }
-        showDLList(URLs);
-        //DLListMoveTo(URLs, 1);
         for (i = 0; i <= URLcount; i++) {
             DLListMoveTo(URLs, i + 1);
-            double originalPr = getPageRank(URLs);
-            alterPageRank(URLs, (((1 - d) / URLcount) + (d * originalPr)));
-        }
-    }
-    showDLList(URLs);
-    //showGraph(webPages, 0);
-    return EXIT_SUCCESS;
-}
+            alterPageRank(URLs, ((1 - d) / URLcount) + (d * (getPageRank(URLs))));
+            diff = diff + fabs(initPageRank2[i] - getPageRank(URLs));
 
+        }
+               printf("final Urls\n");
+        showDLList(URLs);
+    }
+    return EXIT_SUCCESS;
+
+}
+//showDLList(URLs);
+//DLListMoveTo(URLs, 1);
+//for (i = 0; i <= URLcount; i++) {
+//   DLListMoveTo(URLs, i + 1);
+//  double originalPr = getPageRank(URLs);
+//
+//}
+
+//******** switch to using a sum
+/*
+if (originalPrTo == initPageRank2[i]) {
+    alterPageRank (URLs, ((double)originalPrfrom / (double)connections));
+} else {
+    //printf("name: %s, old pr: %lf\n", checkingTo, originalPrTo); //FOR TESTING
+    alterPageRank (URLs, ((double)originalPrTo + ((double)originalPrfrom / (double)connections)));
+}
+*/
+
+//double prToPrint = getPageRank(URLs); //FOR TESTING
+//printf("name: %s, new pr: %lf\n", checkingTo, prToPrint); //FOR TESTING
+//diff = diff + fabs(originalPrTo - getPageRank(URLs))
 
 
 char* stradd(const char* a, const char* b) {
