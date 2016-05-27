@@ -30,8 +30,14 @@ void showDLList(DLList);
 //change pagerank
 DLList alterPageRank (DLList, double);
 
+//alter degree
+DLList alterDegree (DLList, int);
+
 //get pagerank
 double getPageRank (DLList);
+
+//get degree
+int getDegree (DLList L);
 
 // check sanity of a DLList (for testing)
 int validDLList(DLList);
@@ -49,11 +55,11 @@ int DLListMoveTo(DLList, int);
 
 // insert an item before current item
 // new item becomes current item
-void DLListBefore(DLList, char *, double);
+void DLListBefore(DLList, char *, double, int);
 
 // insert an item after current item
 // new item becomes current item
-void DLListAfter(DLList, char *, double);
+void DLListAfter(DLList, char *, double, int);
 
 // delete current item
 // new item becomes item following current
@@ -66,5 +72,8 @@ int DLListLength(DLList);
 
 // is the list empty?
 int DLListIsEmpty(DLList);
+
+//print to pagerankList.txt
+void printToFile (DLList);
 
 #endif
