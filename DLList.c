@@ -13,6 +13,7 @@
 typedef struct DLListNode {
 	char   *urlname;  // urlname of this list item (string)
 	double    pagerank; //pagerank value
+	int degree;
 	struct DLListNode *prev;
 	// pointer previous node in list
 	struct DLListNode *next;
@@ -27,13 +28,14 @@ typedef struct DLListRep {
 } DLListRep;
 
 // create a new DLListNode (private function)
-static DLListNode *newDLListNode(char *it, double pr)
+static DLListNode *newDLListNode(char *it, double pr, int d)
 {
 	DLListNode *new;
 	new = malloc(sizeof(DLListNode));
 	assert(new != NULL);
 	new->urlname = strdup(it);
 	new->pagerank = pr;
+	new->degree = d;
 	new->prev = new->next = NULL;
 	return new;
 }
@@ -44,6 +46,14 @@ DLList alterPageRank (DLList L, double pr) {
 	assert(L->curr != NULL);
 	L->curr->pagerank = pr;
 	return L;
+}
+
+//alter degree
+DLList alterDegree (DLList L, int d) {
+	assert(L != NULL);
+	assert(L->curr != NULL);
+	L->curr->degree = d;
+	return L;
 
 }
 //get pagerank
@@ -52,6 +62,14 @@ double getPageRank (DLList L) {
 	assert(L->curr != NULL);
 	return L->curr->pagerank;
 }
+
+//get degree
+int getDegree (DLList L) {
+	assert(L != NULL);
+	assert(L->curr != NULL);
+	return L->curr->degree;
+}
+
 
 // create a new empty DLList
 DLList newDLList()
@@ -124,7 +142,7 @@ void showDLList(DLList L)
 	assert(L != NULL);
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		printf("name :%s, pr: %f\n", curr->urlname, curr->pagerank);
+		printf("%s, %d, %f\n", curr->urlname, curr->degree, curr->pagerank);
 }
 
 // check sanity of a DLList (for testing)
@@ -223,13 +241,13 @@ int DLListMoveTo(DLList L, int i)
 
 // insert an item before current item
 // new item becomes current item
-void DLListBefore(DLList L, char *it, double pr)
+void DLListBefore(DLList L, char *it, double pr, int d)
 {
 	assert(L != NULL);
 	// COMPLETE THIS FUNCTION
 	//DLListNode *newNode = malloc(sizeof(DLListNode));
 	//newNode->urlname = it;
-	DLListNode *newNode = newDLListNode(it, pr);
+	DLListNode *newNode = newDLListNode(it, pr, d);
 
 	if (L->nitems == 0) {
 		// if list is empty
@@ -258,17 +276,17 @@ void DLListBefore(DLList L, char *it, double pr)
 
 // insert an item after current item
 // new item becomes current item
-void DLListAfter(DLList L, char *it, double pr)
+void DLListAfter(DLList L, char *it, double pr, int d)
 {
 	assert(L != NULL);
 	if (L->nitems == 0) {
-		DLListNode *new = newDLListNode(it, pr);
+		DLListNode *new = newDLListNode(it, pr, d);
 		L->first = new;
 		L->last = new;
 		L->curr = new;
 	} else {
 		DLListNode *temp = L->curr->next;
-		DLListNode *new = newDLListNode(it, pr);
+		DLListNode *new = newDLListNode(it, pr, d);
 		new->prev = L->curr;
 		L->curr->next = new;
 
@@ -321,3 +339,10 @@ int DLListIsEmpty(DLList L)
 	return (L->nitems == 0);
 }
 
+void printToFile (DLList L) {
+	assert(L != NULL);
+	FILE * outputFile = fopen("pagerankList.txt", "w");
+	DLListNode *curr;
+	for (curr = L->first; curr != NULL; curr = curr->next)
+		fprintf(outputFile, "%s, %d, %f\n", curr->urlname, curr->degree, curr->pagerank);
+}
