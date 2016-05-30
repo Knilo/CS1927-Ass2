@@ -44,7 +44,6 @@ int main (int argc, const char * argv[]) {
     int URLcount = DLListLength(URLs);
     int i;
 
-//********** currently working on (all above works) **************
     int iteration;
     int maxIterations = 100;
     double diffPR = 0.00001;
@@ -120,31 +119,6 @@ int main (int argc, const char * argv[]) {
     return EXIT_SUCCESS;
 
 }
-//printf("final Urls\n");
-
-
-//showDLList(URLs);
-//DLListMoveTo(URLs, 1);
-//for (i = 0; i <= URLcount; i++) {
-//   DLListMoveTo(URLs, i + 1);
-//  double originalPr = getPageRank(URLs);
-//
-//}
-
-//******** switch to using a sum
-/*
-if (originalPrTo == initPageRank2[i]) {
-    alterPageRank (URLs, ((double)originalPrfrom / (double)connections));
-} else {
-    //printf("name: %s, old pr: %lf\n", checkingTo, originalPrTo); //FOR TESTING
-    alterPageRank (URLs, ((double)originalPrTo + ((double)originalPrfrom / (double)connections)));
-}
-*/
-
-//double prToPrint = getPageRank(URLs); //FOR TESTING
-//printf("name: %s, new pr: %lf\n", checkingTo, prToPrint); //FOR TESTING
-//diff = diff + fabs(originalPrTo - getPageRank(URLs))
-
 
 char* stradd(const char* a, const char* b) {
     size_t len = strlen(a) + strlen(b);

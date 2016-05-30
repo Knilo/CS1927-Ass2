@@ -12,7 +12,7 @@
 
 typedef struct DLListNode {
 	char   *urlname;  // urlname of this list item (string)
-	double    pagerank; //pagerank value
+	double    info1; //info1 value
 	int degree;
 	struct DLListNode *prev;
 	// pointer previous node in list
@@ -34,17 +34,17 @@ static DLListNode *newDLListNode(char *it, double pr, int d)
 	new = malloc(sizeof(DLListNode));
 	assert(new != NULL);
 	new->urlname = strdup(it);
-	new->pagerank = pr;
+	new->info1 = pr;
 	new->degree = d;
 	new->prev = new->next = NULL;
 	return new;
 }
 
-//alter pagerank
-DLList alterPageRank (DLList L, double pr) {
+//alter info1
+DLList alterinfo1 (DLList L, double pr) {
 	assert(L != NULL);
 	assert(L->curr != NULL);
-	L->curr->pagerank = pr;
+	L->curr->info1 = pr;
 	return L;
 }
 
@@ -56,11 +56,11 @@ DLList alterDegree (DLList L, int d) {
 	return L;
 
 }
-//get pagerank
-double getPageRank (DLList L) {
+//get info1
+double getinfo1 (DLList L) {
 	assert(L != NULL);
 	assert(L->curr != NULL);
-	return L->curr->pagerank;
+	return L->curr->info1;
 }
 
 //get degree
@@ -142,7 +142,7 @@ void showDLList(DLList L)
 	assert(L != NULL);
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		printf("%s, %d, %f\n", curr->urlname, curr->degree, curr->pagerank);
+		printf("%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->info1);
 }
 
 // check sanity of a DLList (for testing)
@@ -344,5 +344,5 @@ void printToFile (DLList L) {
 	FILE * outputFile = fopen("pagerankList.txt", "w");
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		fprintf(outputFile, "%s, %d, %f\n", curr->urlname, curr->degree, curr->pagerank);
+		fprintf(outputFile, "%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->info1);
 }

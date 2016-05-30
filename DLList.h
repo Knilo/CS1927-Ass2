@@ -27,14 +27,14 @@ void freeDLList(DLList);
 // display list on output, one item per line
 void showDLList(DLList);
 
-//change pagerank
-DLList alterPageRank (DLList, double);
+//change info1
+DLList alterinfo1 (DLList, double);
 
 //alter degree
 DLList alterDegree (DLList, int);
 
-//get pagerank
-double getPageRank (DLList);
+//get info1
+double getinfo1 (DLList);
 
 //get degree
 int getDegree (DLList L);
