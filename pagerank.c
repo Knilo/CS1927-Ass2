@@ -29,7 +29,6 @@ PageRank(d, diffPR, maxIterations)
 #include "DLList.h"
 #include "url.h"
 
-#define MAXSTRING 50
 #define BUFSIZE 50
 
 void PageRank(double d, double diffPR, int maxIterations);
@@ -47,7 +46,7 @@ int main (int argc, const char * argv[]) {
         diffPR = atof(argv[2]);
         maxIterations = atoi(argv[3]);
     } else {
-        fprintf(stderr, "Usage: %s dampingfactor diffPR iterations\n", argv[0]);
+        fprintf(stderr, "Usage: %s 'dampingfactor' 'diffPR' 'iterations'\n", argv[0]);
         exit(1);
     }
     PageRank(dampingfactor, diffPR, maxIterations);
@@ -73,7 +72,7 @@ void PageRank(double d, double diffPR, int maxIterations) {
 
         //get initial pageranks for iteration
         for (i = 0; i <= URLcount; i++) {
-            initPageRank2[i] = getPageRank(URLs);
+            initPageRank2[i] = getinfo1(URLs);
             DLListMoveTo(URLs, i + 1);
         }
         /* FOR TESTING
@@ -107,10 +106,10 @@ void PageRank(double d, double diffPR, int maxIterations) {
             }
             DLListMoveTo(URLs, i + 1);
             //printf("checking: %d\n", i+1); // FOR TESTING
-            alterPageRank(URLs, ((1 - d) / URLcount) + d * (sum));
+            alterinfo1(URLs, ((1 - d) / URLcount) + d * (sum));
             //printf("    old: %f\n", initPageRank2[i]); //FOR TESTING
             //printf("    new: %f\n", getPageRank(URLs)); //FOR TESTING
-            diff = diff + fabs(initPageRank2[i] - getPageRank(URLs));
+            diff = diff + fabs(initPageRank2[i] - getinfo1(URLs));
             //printf("    diff: %f\n", diff);
         }
 
@@ -157,7 +156,7 @@ DLList getCollection() {
     DLListMoveTo(URLs, 1);
     for (i = 0; i <= URLcount; i++) {
 
-        alterPageRank (URLs, initPageRank);
+        alterinfo1 (URLs, initPageRank);
         DLListMove(URLs, 1);
     }
     return URLs;
