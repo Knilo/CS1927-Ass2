@@ -9,6 +9,7 @@
 
 #define BUFSIZE 50
 
+DLList calcTfIdf (char * term);
 DLList getCollection();
 char* stradd(const char* a, const char* b);
 int termf(char *url, char *term); //gets the term frequency in the url
@@ -20,16 +21,86 @@ DLList getListOfurls(int argc, char **argv);
 // dont worry about the functions below unless you feel the need to use it
 void getUrlStr(char url[], char *str, int start);
 // gets the url in the string provided, int start determines where to begin the search
-//DLList cmpLists(DLList a, DLList b);
-// compares two lists, all common nodes are added to a new list which is returned at the end
-// of the function
 int maxLen(char *fileN); // returns the largest length of the string in a given file
 // ".txt" is not added in the function, must be done prior
+DLList calcMultipleTerm(DLList a, DLList b);
 
 int main (int argc, const char * argv[]) {
+    int i = 0;
+    if (argc > 1) {
+        DLList TfIdfFinal = newDLList();
+        if (argc == 2) {
 
+            char * term = malloc(sizeof(argv[1]));
+            strcpy(term, argv[1]);
+
+            TfIdfFinal = calcTfIdf(term);
+        }
+        if (argc == 3) {
+
+            char * term = malloc(sizeof(argv[1]));
+            strcpy(term, argv[1]);
+
+            DLList TfIdf1 = newDLList();
+            TfIdf1 = calcTfIdf(term);
+
+            term = malloc(sizeof(argv[2]));
+            strcpy(term, argv[2]);
+
+            DLList TfIdf2 = newDLList();
+            TfIdf2 = calcTfIdf(term);
+
+
+            TfIdfFinal = calcMultipleTerm(TfIdf1, TfIdf2);
+
+        }
+        if (argc > 3) {
+            char * term = malloc(sizeof(argv[1]));
+
+            strcpy(term, argv[1]);
+
+            DLList TfIdf1 = newDLList();
+            TfIdf1 = calcTfIdf(term);
+            //DLList TfIdfFinal = newDLList();
+
+            for (i = 2; argv[i] != NULL; i++) {
+
+                //printf("i = %d", i);
+                term = malloc(sizeof(argv[i]));
+
+                strcpy(term, argv[i]);
+
+                DLList TfIdf2 = newDLList();
+
+                TfIdf2 = calcTfIdf(term);
+
+                if (i == 2) {
+                    TfIdfFinal = calcMultipleTerm(TfIdf1, TfIdf2);
+                } else {
+                    TfIdfFinal = calcMultipleTerm(TfIdf2, TfIdfFinal);
+                }
+
+            }
+// now need to order final list
+
+        }
+        //printToScreenTfIdf(TfIdfFinal);
+        TfIdfFinal = orderByPagerank (TfIdfFinal);
+        //puts("");
+        printToScreenTfIdf(TfIdfFinal);
+
+    } else {
+        fprintf(stderr, "usage: %s term1 term2 term3...\n", argv[0]);
+        exit(1);
+
+    }
+
+    return EXIT_SUCCESS;
+
+}
+
+DLList calcTfIdf (char * term) {
     int i;
-    char *term = "mars";
     char buffer[BUFSIZE];
     int URLcount = 0;
     DLList URLs = getCollection();
@@ -60,22 +131,27 @@ int main (int argc, const char * argv[]) {
     fclose(inverted);
 //calculate IDF for term
     int totalUrls = DLListLength(URLs);
+    freeDLList(URLs);
     //printf("totalUrls = %d\n", totalUrls);
     int termUrls = DLListLength(URLwTerm);
+        if (termUrls == 0) {
+        return URLwTerm;
+    }
+
     //printf("termUrls = %d\n", termUrls);
-    double toBeIDF = (double)totalUrls/(double)termUrls;
+    double toBeIDF = (double)totalUrls / (double)termUrls;
     //printf("toBeIDF = %f\n", toBeIDF);
     double IDF = log(toBeIDF);
     //printf("IDF = %f\n", IDF);
     //calculate tf for each URL in URLwTerm
-    for (i = 0; i <= termUrls; i++){
-        DLListMoveTo(URLwTerm, i+1);
+    for (i = 0; i <= termUrls; i++) {
+        DLListMoveTo(URLwTerm, i + 1);
         alterpagerank(URLwTerm, (IDF * termf(DLListCurrent(URLwTerm), term)));
 
     }
-    printToScreenTfIdf(URLwTerm);
+    //printToScreenTfIdf(URLwTerm);
 
-    return EXIT_SUCCESS;
+    return URLwTerm;
 }
 
 
@@ -130,7 +206,7 @@ int termf(char *url, char *term) { // finds the term frequency in the url
     assert(urlFile != NULL);
     int j, k;
     while (fgets(str, maxStrLen, urlFile) != NULL && strncmp(str, "#start Section-2", 16) != 0);
-    while (fgets(str,maxStrLen, urlFile) != NULL) {
+    while (fgets(str, maxStrLen, urlFile) != NULL) {
         if (strncmp(str, "#end Section-2", 14) == 0) {
             break;
         }
@@ -144,7 +220,7 @@ int termf(char *url, char *term) { // finds the term frequency in the url
                     termf ++;
                 }
             }
-            
+
         }
     }
     free(str);
@@ -217,4 +293,77 @@ int maxLen(char *fileN) {
     }
     fclose(fp);
     return maxStrLen;
+}
+
+DLList calcMultipleTerm(DLList a, DLList b) {
+
+    if (DLListIsEmpty(b)) {
+        return a;
+    } else if (DLListIsEmpty(a)) {
+        return b;
+    }
+    //puts("1");
+    DLList new = newDLList();
+    //DLListMoveTo(a, 1);
+
+//    DLListMoveTo(b, 1);
+    int i = 0;
+    int j = 0;
+    int used = 0;
+    /*
+    puts("a:");
+    printToScreenTfIdf(a);
+    puts("b:");
+    printToScreenTfIdf(b);
+    */
+    for (i = 0; i < DLListLength(a); i++) {
+
+        DLListMoveTo(a, i + 1);
+        used = 0;
+        for (j = 0; j <= DLListLength(b); j++) {
+            DLListMoveTo(b, j + 1);
+            //if b is in a, sum tfidf and add to new
+            if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
+                DLListAfter(new, DLListCurrent(a), 0, 0);
+                alterpagerank(new, ((double)getpagerank(a) + (double)getpagerank(b)));
+                //puts("new:");
+                //printToScreenTfIdf(new);
+                used = 1;
+                break;
+            }
+        }
+        //DLListMove(b, 1);
+        if (used == 0) {
+            DLListAfter(new, DLListCurrent(a), 0, 0);
+            alterpagerank(new, getpagerank(a));
+            //puts("newhiiiii:");
+            //printToScreenTfIdf(new);
+        }
+    }
+
+    for (i = 0; i <= DLListLength(b); i++) {
+
+        DLListMoveTo(b, i + 1);
+        used = 0;
+        for (j = 0; j <= DLListLength(new); j++) {
+            //puts("4");
+            DLListMoveTo(new, j + 1);
+            if (strcmp(DLListCurrent(b), DLListCurrent(new)) == 0) {
+                used = 1;
+            }
+        }
+        if (used == 0) {
+            DLListAfter(new, DLListCurrent(b), 0, 0);
+            alterpagerank(new, getpagerank(b));
+        }
+
+
+    }
+
+    //puts("new:");
+    //printToScreenTfIdf(new);
+    freeDLList(a);
+    freeDLList(b);
+
+    return new;
 }
