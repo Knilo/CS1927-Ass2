@@ -41,7 +41,7 @@ int getURL(char *src, char *dest, int N)
 	char *d = dest;
 	int nc = 0;
 	while (nc < N && *c != '\0') {
-		if (*c == ' ') break;
+		if (*c == ' ' || *c == '\n') break;
 		*d++ = *c++;
 		nc++;
 	}

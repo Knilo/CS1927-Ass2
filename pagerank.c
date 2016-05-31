@@ -72,7 +72,7 @@ void PageRank(double d, double diffPR, int maxIterations) {
 
         //get initial pageranks for iteration
         for (i = 0; i <= URLcount; i++) {
-            initPageRank2[i] = getinfo1(URLs);
+            initPageRank2[i] = getpagerank(URLs);
             DLListMoveTo(URLs, i + 1);
         }
         /* FOR TESTING
@@ -106,10 +106,10 @@ void PageRank(double d, double diffPR, int maxIterations) {
             }
             DLListMoveTo(URLs, i + 1);
             //printf("checking: %d\n", i+1); // FOR TESTING
-            alterinfo1(URLs, ((1 - d) / URLcount) + d * (sum));
+            alterpagerank(URLs, ((1 - d) / URLcount) + d * (sum));
             //printf("    old: %f\n", initPageRank2[i]); //FOR TESTING
             //printf("    new: %f\n", getPageRank(URLs)); //FOR TESTING
-            diff = diff + fabs(initPageRank2[i] - getinfo1(URLs));
+            diff = diff + fabs(initPageRank2[i] - getpagerank(URLs));
             //printf("    diff: %f\n", diff);
         }
 
@@ -118,7 +118,7 @@ void PageRank(double d, double diffPR, int maxIterations) {
     //printf("%d\n", iteration); FOR TESTING
     //showDLList(URLs); FOR TESTING
 
-    printToFile(URLs);
+    printToFileP(URLs);
 }
 
 char* stradd(const char* a, const char* b) {
@@ -156,7 +156,7 @@ DLList getCollection() {
     DLListMoveTo(URLs, 1);
     for (i = 0; i <= URLcount; i++) {
 
-        alterinfo1 (URLs, initPageRank);
+        alterpagerank (URLs, initPageRank);
         DLListMove(URLs, 1);
     }
     return URLs;

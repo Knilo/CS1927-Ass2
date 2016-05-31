@@ -12,7 +12,7 @@
 
 typedef struct DLListNode {
 	char   *urlname;  // urlname of this list item (string)
-	double    info1; //info1 value
+	double    pagerank; //pagerank value
 	int degree;
 	struct DLListNode *prev;
 	// pointer previous node in list
@@ -34,17 +34,17 @@ static DLListNode *newDLListNode(char *it, double pr, int d)
 	new = malloc(sizeof(DLListNode));
 	assert(new != NULL);
 	new->urlname = strdup(it);
-	new->info1 = pr;
+	new->pagerank = pr;
 	new->degree = d;
 	new->prev = new->next = NULL;
 	return new;
 }
 
-//alter info1
-DLList alterinfo1 (DLList L, double pr) {
+//alter pagerank
+DLList alterpagerank (DLList L, double pr) {
 	assert(L != NULL);
 	assert(L->curr != NULL);
-	L->curr->info1 = pr;
+	L->curr->pagerank = pr;
 	return L;
 }
 
@@ -56,11 +56,11 @@ DLList alterDegree (DLList L, int d) {
 	return L;
 
 }
-//get info1
-double getinfo1 (DLList L) {
+//get pagerank
+double getpagerank (DLList L) {
 	assert(L != NULL);
 	assert(L->curr != NULL);
-	return L->curr->info1;
+	return L->curr->pagerank;
 }
 
 //get degree
@@ -142,7 +142,7 @@ void showDLList(DLList L)
 	assert(L != NULL);
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		printf("%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->info1);
+		printf("%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->pagerank);
 }
 
 // check sanity of a DLList (for testing)
@@ -244,34 +244,27 @@ int DLListMoveTo(DLList L, int i)
 void DLListBefore(DLList L, char *it, double pr, int d)
 {
 	assert(L != NULL);
-	// COMPLETE THIS FUNCTION
-	//DLListNode *newNode = malloc(sizeof(DLListNode));
-	//newNode->urlname = it;
-	DLListNode *newNode = newDLListNode(it, pr, d);
-
-	if (L->nitems == 0) {
-		// if list is empty
-		//printf("case 1\n");
-		L->first = newNode;
-		L->last = newNode;
-		L->curr = newNode;
-		newNode->prev = NULL;
-		newNode->next = NULL;
-	} else if (L->curr == L->first) {
-		//printf("case 2\n");
-		newNode->next = L->curr;
-		newNode->prev = NULL;
-		L->first = newNode;
-		L->curr->prev = newNode;
+	if (L->curr == NULL) {
+		DLListNode *new = newDLListNode(it, pr, d);
+		L->first = new;
+		L->last = new;
+		L->curr = new;
 	} else {
-		//printf("case 3\n");
-		newNode->next = L->curr;
-		newNode->prev = L->curr->prev;
-		L->curr->prev = newNode;
-		newNode->prev->next = newNode;
+		DLListNode *new = newDLListNode(it, pr, d);
+		DLListNode *temp = L->curr->prev;
+		new->next = L->curr;
+		L->curr->prev = new;
+
+		if (L->curr == L->first) {
+			L->first = new;
+		} else {
+			temp->next = new;
+		}
+		new->prev = temp;
+		L->curr = new;
 	}
-	L->nitems++;
-	L->curr = newNode;
+	L->nitems ++;
+
 }
 
 // insert an item after current item
@@ -339,10 +332,92 @@ int DLListIsEmpty(DLList L)
 	return (L->nitems == 0);
 }
 
-void printToFile (DLList L) {
+void printToFileP (DLList L) {
 	assert(L != NULL);
 	FILE * outputFile = fopen("pagerankList.txt", "w");
 	DLListNode *curr;
 	for (curr = L->first; curr != NULL; curr = curr->next)
-		fprintf(outputFile, "%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->info1);
+		fprintf(outputFile, "%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->pagerank);
+}
+
+void printToScreenTfIdf (DLList L) {
+	assert(L != NULL);
+	DLListNode *curr;
+	int i= 0;
+	for (curr = L->first; curr != NULL && i <= 10; curr = curr->next, i++)
+		printf("%s  %0.7f\n", curr->urlname, curr->pagerank);
+}
+
+DLList cmpLists(DLList a, DLList b) {
+	if (DLListIsEmpty(b)) {
+		return a;
+	}
+	DLList new = newDLList();
+	DLListNode *temp = a->first;
+	DLListNode *temp2 = b->first;
+	while (temp != NULL) {
+		temp2 = b->first;
+		while (temp2 != NULL) {
+			if (strcmp(temp->urlname, temp2->urlname) == 0) {
+				DLListAfter(new, temp->urlname, 0, 0);
+				break;
+			}
+			temp2 = temp2->next;
+		}
+		temp = temp->next;
+	}
+	freeDLList(a);
+	freeDLList(b);
+
+	return new;
+}
+
+DLList orderByPagerank (DLList L) {
+	DLList new = newDLList();
+	//puts("hi");
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < DLListLength(L); i++) {
+		DLListMoveTo(L, i + 1);
+		//puts("");
+
+		if (DLListLength(new) == 0) {
+			//puts("yo");
+			DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+		}
+		else if (DLListLength(new) == 1) {
+			//puts("yo yo");
+			if (getpagerank(L) <= getpagerank(new)) {
+				DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			} else {
+				DLListBefore(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			}
+		}
+		else if (DLListLength(new) > 1) {
+			//puts("no yo");
+			DLListMoveTo(new, 1);
+			j = 0;
+			while ((getpagerank(L) <= getpagerank(new)) && j <= DLListLength(new)) {
+				//puts("checking");
+				DLListMove(new, 1);
+				j++;
+			}
+			if (j >= DLListLength(new)) {
+				//puts("poop");
+				DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			} else {
+				//puts("wee");
+				DLListBefore(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			}
+
+		}
+		
+		//printToScreenTfIdf(new);
+	}
+
+
+
+	freeDLList(L);
+//printToScreenTfIdf(new);
+	return new;
 }
