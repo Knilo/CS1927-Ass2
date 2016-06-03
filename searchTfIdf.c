@@ -1,3 +1,8 @@
+// part 2 of assignment 2 COMP1927 searchPagerank.c
+// By : Dae Ro Lee (Justin) z5060887 and Aaron Schneider z5020001
+// Date of completion 29/05/2016
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -27,8 +32,9 @@ DLList calcMultipleTerm(DLList a, DLList b);
 
 int main (int argc, const char * argv[]) {
     int i = 0;
+    DLList TfIdfFinal = newDLList();
     if (argc > 1) {
-        DLList TfIdfFinal = newDLList();
+        //DLList TfIdfFinal = newDLList();
         if (argc == 2) {
 
             char * term = malloc(sizeof(argv[1]));
@@ -94,7 +100,7 @@ int main (int argc, const char * argv[]) {
         exit(1);
 
     }
-
+    free(TfIdfFinal);
     return EXIT_SUCCESS;
 
 }
@@ -144,7 +150,7 @@ DLList calcTfIdf (char * term) {
     double IDF = log(toBeIDF);
     //printf("IDF = %f\n", IDF);
     //calculate tf for each URL in URLwTerm
-    for (i = 0; i <= termUrls; i++) {
+    for (i = 0; i < termUrls; i++) {
         DLListMoveTo(URLwTerm, i + 1);
         alterpagerank(URLwTerm, (IDF * termf(DLListCurrent(URLwTerm), term)));
 
@@ -320,7 +326,7 @@ DLList calcMultipleTerm(DLList a, DLList b) {
 
         DLListMoveTo(a, i + 1);
         used = 0;
-        for (j = 0; j <= DLListLength(b); j++) {
+        for (j = 0; j < DLListLength(b); j++) {
             DLListMoveTo(b, j + 1);
             //if b is in a, sum tfidf and add to new
             if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
@@ -341,7 +347,7 @@ DLList calcMultipleTerm(DLList a, DLList b) {
         }
     }
 
-    for (i = 0; i <= DLListLength(b); i++) {
+    for (i = 0; i < DLListLength(b); i++) {
 
         DLListMoveTo(b, i + 1);
         used = 0;
