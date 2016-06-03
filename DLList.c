@@ -345,7 +345,7 @@ void printToScreenTfIdf (DLList L) {
 	DLListNode *curr;
 	int i= 0;
 	for (curr = L->first; curr != NULL && i <= 10; curr = curr->next, i++)
-		printf("%s  %0.7f\n", curr->urlname, curr->pagerank);
+		printf("%s %0.7f\n", curr->urlname, curr->pagerank);
 }
 
 DLList cmpLists(DLList a, DLList b) {

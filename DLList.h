@@ -74,7 +74,7 @@ int DLListLength(DLList);
 int DLListIsEmpty(DLList);
 
 //print to pagerankList.txt
-void printToFile (DLList);
+void printToFileP (DLList);
 
 void printToScreenTfIdf (DLList);
 
