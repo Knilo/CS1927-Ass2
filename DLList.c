@@ -343,7 +343,7 @@ void printToFileP (DLList L) {
 void printToScreenTfIdf (DLList L) {
 	assert(L != NULL);
 	DLListNode *curr;
-	int i= 0;
+	int i = 0;
 	for (curr = L->first; curr != NULL && i <= 10; curr = curr->next, i++)
 		printf("%s %0.7f\n", curr->urlname, curr->pagerank);
 }
@@ -411,7 +411,7 @@ DLList orderByPagerank (DLList L) {
 			}
 
 		}
-		
+
 		//printToScreenTfIdf(new);
 	}
 
@@ -422,7 +422,69 @@ DLList orderByPagerank (DLList L) {
 	return new;
 }
 
-int isNext(DLList L){
+DLList orderByDegreeAndDeleteDuplicates (DLList L) {
+	DLList new = newDLList();
+	//puts("hi");
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < DLListLength(L); i++) {
+		DLListMoveTo(L, i + 1);
+		//puts("");
+
+		if (DLListLength(new) == 0) {
+			//puts("yo");
+			DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+		}
+		else if (DLListLength(new) == 1) {
+			//puts("yo yo");
+			if (getDegree(L) <= getDegree(new)) {
+				DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			} else {
+				DLListBefore(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			}
+		}
+		else if (DLListLength(new) > 1) {
+			//puts("no yo");
+			DLListMoveTo(new, 1);
+			j = 0;
+			while ((getDegree(L) <= getDegree(new)) && j <= DLListLength(new)) {
+				//puts("checking");
+				DLListMove(new, 1);
+				j++;
+			}
+			if (j >= DLListLength(new)) {
+				//puts("poop");
+				DLListAfter(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			} else {
+				//puts("wee");
+				DLListBefore(new, DLListCurrent(L), getpagerank(L), getDegree(L));
+			}
+
+		}
+
+		//printToScreenTfIdf(new);
+	}
+	char * Urlnames[DLListLength(L)];
+	for (i = 0; i < DLListLength(L); i++) {
+		DLListMoveTo(L, i + 1);
+		for (j = 0; j < DLListLength(L); j++) {
+			if (strcmp(DLListCurrent(L), Urlnames[j]) != 0) {
+				Urlnames[i] = DLListCurrent(L);
+			} else if (strcmp(DLListCurrent(L), Urlnames[j]) == 0) {
+				DLListDelete(L);
+			}
+		}
+	}
+	showDLList(L);
+
+
+
+	freeDLList(L);
+//printToScreenTfIdf(new);
+	return new;
+}
+
+int isNext(DLList L) {
 	assert(L != NULL);
 	return (L->curr->next != NULL);
 }

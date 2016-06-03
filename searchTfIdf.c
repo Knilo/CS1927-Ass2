@@ -137,6 +137,7 @@ DLList calcTfIdf (char * term) {
     fclose(inverted);
 //calculate IDF for term
     int totalUrls = DLListLength(URLs);
+    //printf("Idf = %d\n", totalUrls);
     freeDLList(URLs);
     //printf("totalUrls = %d\n", totalUrls);
     int termUrls = DLListLength(URLwTerm);
@@ -147,7 +148,7 @@ DLList calcTfIdf (char * term) {
     //printf("termUrls = %d\n", termUrls);
     double toBeIDF = (double)totalUrls / (double)termUrls;
     //printf("toBeIDF = %f\n", toBeIDF);
-    double IDF = log(toBeIDF);
+    double IDF = log10(toBeIDF);
     //printf("IDF = %f\n", IDF);
     //calculate tf for each URL in URLwTerm
     for (i = 0; i < termUrls; i++) {
@@ -229,6 +230,7 @@ int termf(char *url, char *term) { // finds the term frequency in the url
 
         }
     }
+    //printf("tf = %d\n", termf);
     free(str);
     free(word);
     fclose(urlFile);
@@ -339,12 +341,14 @@ DLList calcMultipleTerm(DLList a, DLList b) {
             }
         }
         //DLListMove(b, 1);
+        /*
         if (used == 0) {
             DLListAfter(new, DLListCurrent(a), 0, 0);
             alterpagerank(new, getpagerank(a));
             //puts("newhiiiii:");
             //printToScreenTfIdf(new);
         }
+        */
     }
 
     for (i = 0; i < DLListLength(b); i++) {

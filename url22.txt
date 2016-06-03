@@ -9,5 +9,5 @@
     Mars   Sun Pluto Moon circle 
     seasonal winds  circle Mars 
 
-#end Setion-2
+#end Section-2
 
