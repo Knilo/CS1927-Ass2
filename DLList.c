@@ -421,3 +421,8 @@ DLList orderByPagerank (DLList L) {
 //printToScreenTfIdf(new);
 	return new;
 }
+
+int isNext(DLList L){
+	assert(L != NULL);
+	return (L->curr->next != NULL);
+}
