@@ -22,7 +22,7 @@ int main (int argc, const char * argv[]) {
     double dampingfactor = 0;
     double diffPR = 0;
     int maxIterations = 0;
-    if (argc > 3) {
+    if (argc > 3) { 
         dampingfactor =  atof(argv[1]);
         diffPR = atof(argv[2]);
         maxIterations = atoi(argv[3]);
