@@ -20,12 +20,14 @@ void fileSize(DLList l, int *s);
 int factorial(int n);
 double scalFootDist(DLList l, int n, int *p, int numOfFiles);
 double minScaleFDist(DLList l, int n, int numOfFiles);
+//DLList listToPrint(DLList a, DLList b);
 
 
 int main (int argc, const char * argv[]) {
     int i = 0;
     int n = 0;
     DLList mergedList = newDLList();
+    //DLList printMe = newDLList()
     if (argc > 1) {
         //DLList mergedList = newDLList();
         if (argc == 2) {
@@ -92,10 +94,12 @@ int main (int argc, const char * argv[]) {
 
         }
         //int n = getN(mergedList);
-        puts("");
-        printf("n = %d\n", n);
+        //puts("");
+        //printf("n = %d\n", n);
         double wcp = minScaleFDist(mergedList, n, argc-1);
-        printf("wcp = %f\n", wcp);
+        printf("%f\n", wcp);
+        mergedList = orderByDegreeAndDeleteDuplicates(mergedList);
+        showDLList(mergedList);
 
     } else {
         fprintf(stderr, "usage: %s file1 file2 file3...\n", argv[0]);
@@ -238,7 +242,7 @@ int getN(DLList a, DLList b) {
         }
 
     }
-    for (i = 0; i < DLListLength(a); i++) {
+    for (i = 0; i <= DLListLength(a); i++) {
         DLListMoveTo(a, i + 1);
         if (strstr(DLListCurrent(a), "url") == NULL) {
             n--;
@@ -254,7 +258,7 @@ double scalFootDist(DLList l, int n, int *p, int numOfFiles) {
     int *sizeT = malloc(sizeof(int) * numOfFiles); // array of the size of the various files, e.g sizeT[0] = the size of the first file.
     fileSize(l, sizeT);
     int i;
-    printf("n = %d\n", n);
+    //printf("n = %d\n", n);
     int fI = 0; // file Itterator
     if (!DLListIsEmpty(l)) {
         for (i = 0; i < n; i ++) {
@@ -262,7 +266,7 @@ double scalFootDist(DLList l, int n, int *p, int numOfFiles) {
             fI = 0;
             // if the current string has alreday been visited skip
             while (strIsIn(visited, DLListCurrent(l)) || strncmp(DLListCurrent(l), "url", 3) != 0) {
-                printf("t %d\n", strncmp(DLListCurrent(l), "url", 3));
+                //printf("t %d\n", strncmp(DLListCurrent(l), "url", 3));
                 if (strncmp(DLListCurrent(l), "url", 3) != 0) {
                     fI ++;
                 }
@@ -275,26 +279,26 @@ double scalFootDist(DLList l, int n, int *p, int numOfFiles) {
             strcpy(str, DLListCurrent(l));
             DLListAfter(visited, str, 0, 0);
 
-            printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
+            //printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
 
             sum = fabs((double)getDegree(l)/(double)sizeT[fI] - (double)p[i]/(double)n) + sum;
-            printf("after sum = %lf\n", sum);
+            //printf("after sum = %lf\n", sum);
             // finds the same url in the list
             while (DLListMove(l, 1) == 0) {
                 if (strncmp(DLListCurrent(l), "url", 3) != 0) {
                     fI ++;
                 } else {
                     if (strcmp(DLListCurrent(l), str) == 0) {
-                        printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
+                       //printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
                         sum += fabs((double)getDegree(l)/(double)sizeT[fI] - (double)p[i]/(double)n);
-                        printf("after sum = %lf\n", sum);
+                        //printf("after sum = %lf\n", sum);
                     }
                 }
             }
         }
     }
     free(sizeT);
-    printf("final sum = %lf\n", sum);
+    //printf("final sum = %lf\n", sum);
     return sum;
 }
 //finds the different sets of p and uses the output to find the Scale of Distance
@@ -304,7 +308,7 @@ void getPos(int n, int j, int *visited, int *p, double *minScaleFDist, DLList l,
     if (j == n) {
         if (*minScaleFDist < 0) {
             for (i = 0; i < n; i ++) { // for testing
-                printf("p[%d] %d\n", i, p[i]);
+                //printf("p[%d] %d\n", i, p[i]);
             }
             *minScaleFDist = scalFootDist(l, n, p, numOfFiles);
         } else {
@@ -339,8 +343,8 @@ int strIsIn(DLList l, char *str) {
 }
 // wrapper function
 double minScaleFDist(DLList l, int n, int numOfFiles) {
-    int factN = factorial(n);
-    printf("%d\n", factN); // delete after testing
+    //int factN = factorial(n);
+    //printf("%d\n", factN); // delete after testing
 
     double *minScaleFDist = malloc(sizeof(double));
     *minScaleFDist = -1;
@@ -383,3 +387,54 @@ int factorial(int n) {
     }
     return 1;
 }
+/*
+DLList listToPrint(DLList a, DLList b) {
+
+    if (DLListIsEmpty(b)) {
+        return a;
+    } else if (DLListIsEmpty(a)) {
+        return b;
+    }
+    DLList new = newDLList();
+    int i = 0;
+    int j = 0;
+    int used = 0;
+
+    for (i = 0; i < DLListLength(a); i++) {
+
+        DLListMoveTo(a, i + 1);
+        used = 0;
+        for (j = 0; j < DLListLength(b); j++) {
+            DLListMoveTo(b, j + 1);
+            //if b is in a, sum tfidf and add to new
+            if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
+                DLListAfter(new, DLListCurrent(a), 0, 0);
+                used = 1;
+                break;
+            }
+        }
+        if (used == 0) {
+            DLListAfter(new, DLListCurrent(a), 0, 0);
+        }
+    }
+
+    for (i = 0; i < DLListLength(b); i++) {
+
+        DLListMoveTo(b, i + 1);
+        used = 0;
+        for (j = 0; j <= DLListLength(new); j++) {
+            DLListMoveTo(new, j + 1);
+            if (strcmp(DLListCurrent(b), DLListCurrent(new)) == 0) {
+                used = 1;
+            }
+        }
+        if (used == 0) {
+            DLListAfter(new, DLListCurrent(b), 0, 0);
+        }
+
+
+    }
+    freeDLList(a);
+    freeDLList(b);
+    return new;
+}*/

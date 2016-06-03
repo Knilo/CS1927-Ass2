@@ -75,16 +75,16 @@ void pageRank(double d, double diffPR, int maxIterations) {
 
             DLListMoveTo(URLs, i + 1);
             checkingTo = DLListCurrent(URLs);
-            printf("checkingTo: %s\n", checkingTo);
+            //printf("checkingTo: %s\n", checkingTo);
 
             sum = 0;
             for (j = 0; j < URLcount; j++) {
                 DLListMoveTo(URLs, j + 1);
                 checkingFrom = DLListCurrent(URLs);
-                printf("    checkingFrom: %s\n", checkingFrom);
+                //printf("    checkingFrom: %s\n", checkingFrom);
 
                 if ((isConnected(webPages, checkingFrom, checkingTo)) && (strcmp(checkingTo, checkingFrom) != 0)) {
-                    printf("        connected\n");
+                    //printf("        connected\n");
                     sum = (sum + (/*initPageRank2[j]*/getpagerank(URLs) / getDegree(URLs)));
                 }
                 else {
@@ -100,10 +100,10 @@ void pageRank(double d, double diffPR, int maxIterations) {
             diff = diff + fabs(initPageRank2[i] - getpagerank(URLs));
             //printf("    diff: %f\n", diff);
         }
-        puts("");
-        printf("iteration: %d, diff: %f\n", iteration, diff);
-        URLs = orderByPagerank(URLs);
-        showDLList(URLs);
+        //puts("");
+        //printf("iteration: %d, diff: %f\n", iteration, diff);
+        //URLs = orderByPagerank(URLs);
+        //showDLList(URLs);
 
     }
 

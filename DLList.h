@@ -82,6 +82,8 @@ DLList cmpLists(DLList a, DLList b);
 
 DLList orderByPagerank (DLList L);
 
+DLList orderByDegreeAndDeleteDuplicates (DLList L);
+
 int isNext(DLList L);
 
 #endif
