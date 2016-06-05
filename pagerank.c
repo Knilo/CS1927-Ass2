@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "graph.h"
+#include "Graph.h"
 #include "DLList.h"
 #include "url.h"
 
