@@ -10,241 +10,157 @@
 #define BUFSIZE 50
 
 DLList getListWithPosition(char * file);
-//char* stradd(const char* a, const char* b);
 int getN(DLList a, DLList b);
 DLList makeMergedList(DLList a, DLList b);
 int strIsIn(DLList, char *);
-//void positionArry(int n, int *p);
 void getPos(int n, int j, int *visited, int *p, double *minScaleFDist, DLList l, int numOfFiles);
 void fileSize(DLList l, int *s);
 int factorial(int n);
 double scalFootDist(DLList l, int n, int *p, int numOfFiles);
 double minScaleFDist(DLList l, int n, int numOfFiles);
-//DLList listToPrint(DLList a, DLList b);
-
+void printUrls(DLList l, int n);
 
 int main (int argc, const char * argv[]) {
     int i = 0;
     int n = 0;
-    DLList mergedList = newDLList();
-    //DLList printMe = newDLList()
-    if (argc > 1) {
-        //DLList mergedList = newDLList();
-        if (argc == 2) {
-
-            char * file = malloc(sizeof(argv[1]));
-            strcpy(file, argv[1]);
-
-            mergedList = getListWithPosition(file);
-            n = DLListLength(mergedList);
+    DLList mergedList = newDLList(); //create list to print
+    if (argc > 1) { //check amount of inputs
+        if (argc == 2) { //if one input
+            char * file = malloc(sizeof(argv[1])); //set string with length of file name
+            strcpy(file, argv[1]); //copy filename to string
+            mergedList = getListWithPosition(file); //call function to create list of urls in file with position
+            n = (DLListLength(mergedList) - 1); //sets n for list
+            free(file);
         }
-        if (argc == 3) {
-            //puts("1");
-            char file1[50];// = malloc(sizeof(argv[1]));
-            //puts("2");
-            strcpy(file1, argv[1]);
-            //puts("3");
-            DLList listForFile1 = newDLList();
-            listForFile1 = getListWithPosition(file1);
-            //showDLList(listForFile1);
-            //puts("");
-
-            char file2[50];// = malloc(sizeof(argv[2]));
-            strcpy(file2, argv[2]);
-            DLList listForFile2 = newDLList();
-            listForFile2 = getListWithPosition(file2);
-            //showDLList(listForFile2);
-            //puts("");
-
-            n = getN(listForFile1, listForFile2);
-            mergedList = makeMergedList(listForFile1, listForFile2);
-            //showDLList(mergedList);
-
+        if (argc == 3) { //if two input files
+            char file1[50]; //create array of charcters to store file name
+            strcpy(file1, argv[1]); //copy filename to array
+            DLList listForFile1 = newDLList(); //create empty list for file 1
+            listForFile1 = getListWithPosition(file1); //call function to create list of urls in file 1 with position
+            char file2[50]; //create array of charcters to store file name
+            strcpy(file2, argv[2]); //copy filename to array
+            DLList listForFile2 = newDLList(); //create empty list for file 2
+            listForFile2 = getListWithPosition(file2); //call function to create list of urls in file 2 with position
+            n = getN(listForFile1, listForFile2); //call function to calculate n
+            mergedList = makeMergedList(listForFile1, listForFile2); //call function to merge lists for final calculation
         }
-        if (argc > 3) {
-            char file1[50];// = malloc(sizeof(argv[1]));
-
-            strcpy(file1, argv[1]);
-
-            DLList listForFile1 = newDLList();
-            listForFile1 = getListWithPosition(file1);
-            //DLList TfIdfFinal = newDLList();
-
+        if (argc > 3) { //if there are more than 2 inputs
+            char file1[50]; //create array of charcters to store file name
+            strcpy(file1, argv[1]); //copy filename to array
+            DLList listForFile1 = newDLList(); //create empty list for file 1
+            listForFile1 = getListWithPosition(file1); //call function to create list of urls in file 1 with position
             for (i = 2; argv[i] != NULL; i++) {
 
-                //printf("i = %d", i);
-                char nextFile[50];// = malloc(sizeof(argv[i]));
-
-                strcpy(nextFile, argv[i]);
-
-                DLList listForNextFile = newDLList();
-
-                listForNextFile = getListWithPosition(nextFile);
-
-                if (i == 2) {
-                    n = getN(listForFile1, listForNextFile);
-                    mergedList = makeMergedList(listForFile1, listForNextFile);
+                char nextFile[50]; //create array of characters to store next filename
+                strcpy(nextFile, argv[i]); //copy filename to array
+                DLList listForNextFile = newDLList(); //create empty list for next file
+                listForNextFile = getListWithPosition(nextFile);//call function to create list of urls in next file with position
+                if (i == 2) { //if second file
+                    n = getN(listForFile1, listForNextFile); //call function to calculate n
+                    mergedList = makeMergedList(listForFile1, listForNextFile); //call function to merge lists for final calculation
                 } else {
-                    n = getN(listForNextFile, mergedList);
-                    mergedList = makeMergedList(listForNextFile, mergedList);
+                    n = getN(listForNextFile, mergedList); //call function to calculate n
+                    mergedList = makeMergedList(listForNextFile, mergedList); //call function to merge lists for final calculation
                 }
-
             }
-// now need to order final list
-
         }
-        //int n = getN(mergedList);
-        //puts("");
-        //printf("n = %d\n", n);
-        double wcp = minScaleFDist(mergedList, n, argc-1);
-        printf("%f\n", wcp);
-        mergedList = orderByDegreeAndDeleteDuplicates(mergedList);
-        showDLList(mergedList);
-
-    } else {
+        double wcp = minScaleFDist(mergedList, n, argc - 1); //call function to calculate wcp
+        printf("%f\n", wcp); //print wcp
+        printUrls(mergedList, n); //call function to order and print urls
+        free(mergedList); //free final list
+    } else { //if incorrect inputs print error message
         fprintf(stderr, "usage: %s file1 file2 file3...\n", argv[0]);
         exit(1);
 
     }
-    free(mergedList);
+
     return EXIT_SUCCESS;
-    /*
-    }
-        DLList T1 = newDLList();
-        T1 = getListWithPosition("rankA.txt");
-
-
-
-        DLList T2 = newDLList();
-        T2 = getListWithPosition("rankB.txt");
-
-
-        DLList merged = newDLList();
-        merged = mergeLists(T1, T2);
-        int n = DLListLength(merged);
-        int sizeT1 = DLListLength(T1);
-        int sizeT2 = DLListLength(T2);
-        for (i = 0; i <= DLListLength(T1); i++) {
-            getdegree(T1);
-        }
-    */
-
-
-
-
-
-
-
 }
-
+//function to create list from file and calculate their positions
 DLList getListWithPosition(char * file) {
     int i;
-    DLList URLs = newDLList();
-    //char* filename = stradd(file, ".txt");
+    DLList URLs = newDLList(); //create empty list
     char buffer[BUFSIZE];
-    //int URLcount = 0;
-    FILE * openfile = fopen (file, "r");
-    while (!feof(openfile)) {
-        while ((fgets(buffer, sizeof(buffer), openfile) != NULL)) {
+    FILE * openfile = fopen (file, "r"); //open the supllied file
+    while (!feof(openfile)) { //read until end of file
+        while ((fgets(buffer, sizeof(buffer), openfile) != NULL)) { //get line
             char *cur, link[BUFSIZE];
             cur = buffer;
-            while ((cur = nextURL(cur)) != NULL) {
-
-                getURL(cur, link, BUFSIZE - 1);
-                DLListAfter(URLs, link, 0, 0);
-                //showDLList(URLs);
-                //URLcount++;
-                //printf("%s, %d\n", link, URLcount);
+            while ((cur = nextURL(cur)) != NULL) { //find next "url..."
+                getURL(cur, link, BUFSIZE - 1); //normalise url name
+                DLListAfter(URLs, link, 0, 0); //add to list
                 cur += strlen(link);
             }
         }
     }
-    fclose(openfile);
-
-    int URLcount = DLListLength(URLs);
-//add postions to nodes
+    fclose(openfile); //close file
+    int URLcount = DLListLength(URLs); //calculate amounf of urls
     DLListMoveTo(URLs, 1);
-    for (i = 0; i <= URLcount; i++) {
-
+    for (i = 0; i <= URLcount; i++) { //loop to add postions to nodes
         alterDegree (URLs, i + 1);
         DLListMove(URLs, 1);
     }
     alterDegree(URLs, (getDegree(URLs) - 1));
     char length[50];
-    //put length of list as last node
-    //itoa(DLListLength(URLs), length, 10);
-    i = sprintf(length, "%d", DLListLength(URLs));
-    DLListAfter(URLs, length, 0, 0);
+    i = sprintf(length, "%d", DLListLength(URLs)); //convert length as integer to string
+    DLListAfter(URLs, length, 0, 0); //put length of list as last node
     return URLs;
 }
-/*
-char* stradd(const char* a, const char* b) {
-    size_t len = strlen(a) + strlen(b);
-    char *ret = (char*)malloc(len * sizeof(char) + 1);
-    *ret = '\0';
-    return strcat(strcat(ret, a) , b);
-}*/
-
+//function to merge to url lists with postion
 DLList makeMergedList(DLList a, DLList b) {
-
+    //if one of the lists is empty, return the other
     if (DLListIsEmpty(b)) {
+        freeDLList(b);
         return a;
     } else if (DLListIsEmpty(a)) {
+        freeDLList(a);
         return b;
     }
-
-    DLList new = newDLList();
+    DLList new = newDLList(); //create new empty list
     int i = 0;
-
-    for (i = 0; i < DLListLength(a); i++) {
-
+    for (i = 0; i < DLListLength(a); i++) { //add all nodes from a to new
         DLListMoveTo(a, i + 1);
         DLListAfter(new, DLListCurrent(a), 0, getDegree(a));
     }
-    for (i = 0; i < DLListLength(b); i++) {
-
+    for (i = 0; i < DLListLength(b); i++) { //add all nodes from b to new
         DLListMoveTo(b, i + 1);
         DLListAfter(new, DLListCurrent(b), 0, getDegree(b));
     }
+    //free both lists
     freeDLList(a);
     freeDLList(b);
     return new;
 }
-
+//function to calculate n (amount of urls)
 int getN(DLList a, DLList b) {
-
-
+    //if one of the supllied lists is empty return the other
     if (DLListIsEmpty(b)) {
         return DLListLength(a);
     } else if (DLListIsEmpty(a)) {
         return DLListLength(b);
     }
-    //DLList new = newDLList();
-
     int i = 0;
     int j = 0;
-    //int used = 0;
-    int n = DLListLength(a) + DLListLength(b);
-    //printf("n= %d", n);
-
-    for (i = 0; i < DLListLength(a); i++) {
-
+    int n = DLListLength(a) + DLListLength(b); //set n to be total of both lists
+    for (i = 0; i < DLListLength(a); i++) { //cycle through a
         DLListMoveTo(a, i + 1);
-        //used = 0;
-        for (j = 0; j <= DLListLength(b); j++) {
+        for (j = 0; j <= DLListLength(b); j++) { //search through b for any nodes that coincide
             DLListMoveTo(b, j + 1);
-            //if b is in a, sum tfidf and add to new
-            if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
-                //DLListAfter(new, DLListCurrent(a), 0, 0);
+            if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) { //if b is in subract 1 from n
                 n--;
                 break;
             }
         }
-
     }
-    for (i = 0; i <= DLListLength(a); i++) {
+    for (i = 0; i < DLListLength(a); i++) { //search through a for any nodes not of type url... subract from n if one is found
         DLListMoveTo(a, i + 1);
         if (strstr(DLListCurrent(a), "url") == NULL) {
+            n--;
+        }
+    }
+        for (i = 0; i < DLListLength(b); i++) { //search through b for any nodes not of type url... subract from n if one is found
+        DLListMoveTo(b, i + 1);
+        if (strstr(DLListCurrent(b), "url") == NULL) {
             n--;
         }
     }
@@ -275,13 +191,13 @@ double scalFootDist(DLList l, int n, int *p, int numOfFiles) {
                     return sum;
                 }
             }
-            
+
             strcpy(str, DLListCurrent(l));
             DLListAfter(visited, str, 0, 0);
 
             //printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
 
-            sum = fabs((double)getDegree(l)/(double)sizeT[fI] - (double)p[i]/(double)n) + sum;
+            sum = fabs((double)getDegree(l) / (double)sizeT[fI] - (double)p[i] / (double)n) + sum;
             //printf("after sum = %lf\n", sum);
             // finds the same url in the list
             while (DLListMove(l, 1) == 0) {
@@ -289,8 +205,8 @@ double scalFootDist(DLList l, int n, int *p, int numOfFiles) {
                     fI ++;
                 } else {
                     if (strcmp(DLListCurrent(l), str) == 0) {
-                       //printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
-                        sum += fabs((double)getDegree(l)/(double)sizeT[fI] - (double)p[i]/(double)n);
+                        //printf("degree = %d, sizet = %d, p[i] = %d, sum = %f\n", getDegree(l), sizeT[fI], p[i], sum);
+                        sum += fabs((double)getDegree(l) / (double)sizeT[fI] - (double)p[i] / (double)n);
                         //printf("after sum = %lf\n", sum);
                     }
                 }
@@ -380,61 +296,27 @@ void fileSize(DLList l, int *s) {
         }
         DLListMoveTo(l, 1);
     }
-} 
+}
 int factorial(int n) {
     if (n > 1) {
         return n * factorial(n - 1);
     }
     return 1;
 }
-/*
-DLList listToPrint(DLList a, DLList b) {
 
-    if (DLListIsEmpty(b)) {
-        return a;
-    } else if (DLListIsEmpty(a)) {
-        return b;
-    }
-    DLList new = newDLList();
-    int i = 0;
-    int j = 0;
-    int used = 0;
-
-    for (i = 0; i < DLListLength(a); i++) {
-
-        DLListMoveTo(a, i + 1);
-        used = 0;
-        for (j = 0; j < DLListLength(b); j++) {
-            DLListMoveTo(b, j + 1);
-            //if b is in a, sum tfidf and add to new
-            if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
-                DLListAfter(new, DLListCurrent(a), 0, 0);
-                used = 1;
-                break;
+void printUrls(DLList l, int n) {
+    DLList visited = newDLList();
+    DLListMoveTo(l, 1);
+    DLList temp = l;
+    while (DLListLength(visited) < n) {
+        if (strncmp(DLListCurrent(temp), "url", 3) == 0) {
+            if (!strIsIn(visited, DLListCurrent(temp))) {
+                DLListAfter(visited, DLListCurrent(temp), 0, 0);
+                printf("%s\n", DLListCurrent(temp));
             }
         }
-        if (used == 0) {
-            DLListAfter(new, DLListCurrent(a), 0, 0);
+        if (DLListMove(temp, 1) == 1) {
+            break;
         }
     }
-
-    for (i = 0; i < DLListLength(b); i++) {
-
-        DLListMoveTo(b, i + 1);
-        used = 0;
-        for (j = 0; j <= DLListLength(new); j++) {
-            DLListMoveTo(new, j + 1);
-            if (strcmp(DLListCurrent(b), DLListCurrent(new)) == 0) {
-                used = 1;
-            }
-        }
-        if (used == 0) {
-            DLListAfter(new, DLListCurrent(b), 0, 0);
-        }
-
-
-    }
-    freeDLList(a);
-    freeDLList(b);
-    return new;
-}*/
+}
