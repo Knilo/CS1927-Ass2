@@ -22,171 +22,125 @@ int main (int argc, const char * argv[]) {
     double dampingfactor = 0;
     double diffPR = 0;
     int maxIterations = 0;
-    if (argc > 3) { 
+    if (argc > 3) { //check for correct amount of inputs and assign to variables
         dampingfactor =  atof(argv[1]);
         diffPR = atof(argv[2]);
         maxIterations = atoi(argv[3]);
-    } else {
+    } else { //if incorrect number of inputs prints wrror message
         fprintf(stderr, "Usage: %s 'dampingfactor' 'diffPR' 'iterations'\n", argv[0]);
         exit(1);
     }
-    pageRank(dampingfactor, diffPR, maxIterations);
+    pageRank(dampingfactor, diffPR, maxIterations); //call function to determinf pagerank
 
     return EXIT_SUCCESS;
 }
 
 void pageRank(double d, double diffPR, int maxIterations) {
 
-    DLList URLs = getCollection();
-    Graph webPages = makeGraph(URLs);
-    //showGraph(webPages, 0);
+    DLList URLs = getCollection(); //calls function to read collection.txt and create a linked list of all the URLs in the system
+    Graph webPages = makeGraph(URLs); //creates a graph based on the linked list of URLs
 
-    int URLcount = DLListLength(URLs);
+    int URLcount = DLListLength(URLs); //determines the amount of URLs
     int i;
     int j = 0;
-    int iteration = 0;
-    double diff = diffPR;
+    int iteration = 0; //sets iteration to 0
+    double diff = diffPR; //assigns diffPR to diff
     char * checkingFrom;
     char * checkingTo;
-    double sum = 0;
+    double sum = 0; //sum set intially to 0
 
     double initPageRank2[URLcount];
     for (iteration = 0; iteration < maxIterations && diff >= diffPR; iteration ++) {
 
-        //get initial pageranks for iteration
-        for (i = 0; i < URLcount; i++) {
-            DLListMoveTo(URLs, i + 1);
-            initPageRank2[i] = getpagerank(URLs);
-
-        }
-        /* FOR TESTING
-        printf("printing initPageRank2\n");
-        for (i = 0; i < (sizeof (initPageRank2) / sizeof (initPageRank2[0])); i++) {
-            printf("    %f\n", initPageRank2[i]);
-        }
-        printf("finished printing\n");
-        */
-
-        //set diff as 0
-        diff = 0;
+        diff = 0; //set diff as 0
 
         //for every i check if anything connects to it
-        for (i = 0; i < URLcount; i++) {
-
+        for (i = 0; i < URLcount; i++) { //first for checks for connections towards the URL
             DLListMoveTo(URLs, i + 1);
             checkingTo = DLListCurrent(URLs);
-            //printf("checkingTo: %s\n", checkingTo);
-
             sum = 0;
-            for (j = 0; j < URLcount; j++) {
+            for (j = 0; j < URLcount; j++) { //second for cycles through rest of the URLs to see what connects to original
                 DLListMoveTo(URLs, j + 1);
                 checkingFrom = DLListCurrent(URLs);
-                //printf("    checkingFrom: %s\n", checkingFrom);
+                if ((isConnected(webPages, checkingFrom, checkingTo)) && (strcmp(checkingTo, checkingFrom) != 0)) { //is the URL connected to it?
 
-                if ((isConnected(webPages, checkingFrom, checkingTo)) && (strcmp(checkingTo, checkingFrom) != 0)) {
-                    //printf("        connected\n");
-                    sum = (sum + (/*initPageRank2[j]*/getpagerank(URLs) / getDegree(URLs)));
+                    sum = (sum + (getpagerank(URLs) / getDegree(URLs))); //adds the pagerank of the connecting URL divided by the degree of the connecting URL to the sum
                 }
                 else {
                     continue;
                 }
 
             }
-            DLListMoveTo(URLs, i + 1);
-            //printf("checking: %d\n", i+1); // FOR TESTING
-            alterpagerank(URLs, (((1 - d) / URLcount) + (d * (sum))));
-            //printf("    old: %f\n", initPageRank2[i]); //FOR TESTING
-            //printf("    new: %f\n", getPageRank(URLs)); //FOR TESTING
-            diff = diff + fabs(initPageRank2[i] - getpagerank(URLs));
-            //printf("    diff: %f\n", diff);
+            DLListMoveTo(URLs, i + 1); //returns to the URL we were checking to
+            alterpagerank(URLs, (((1 - d) / URLcount) + (d * (sum)))); //updates the pagerank according to the formula
+            diff = diff + fabs(initPageRank2[i] - getpagerank(URLs)); //updates diff
         }
-        //puts("");
-        //printf("iteration: %d, diff: %f\n", iteration, diff);
-        //URLs = orderByPagerank(URLs);
-        //showDLList(URLs);
-
     }
-
-    //printf("%d\n", iteration); FOR TESTING
-    //showDLList(URLs); FOR TESTING
-    URLs = orderByPagerank(URLs);
-    printToFileP(URLs);
-    freeDLList(URLs);
-    disposeGraph(webPages);
+    URLs = orderByPagerank(URLs); //calls function to order URLs by pagerank
+    printToFileP(URLs);  //calls function to print the URLs and pagerank to the file
+    freeDLList(URLs); //frees the linked list
+    disposeGraph(webPages); //frees the graph
 }
-
+//This function is used to append ".txt" to the url name - helper function
 char* stradd(const char* a, const char* b) {
     size_t len = strlen(a) + strlen(b);
     char *ret = (char*)malloc(len * sizeof(char) + 1);
     *ret = '\0';
     return strcat(strcat(ret, a) , b);
 }
-
+//this functions opens collection.txt to find the Urls in the system
 DLList getCollection() {
     int i;
-    DLList URLs = newDLList();
+    DLList URLs = newDLList(); //creates an empty list
     char buffer[BUFSIZE];
-    //int URLcount = 0;
-    FILE * collection = fopen ("collection.txt", "r");
-    while (!feof(collection)) {
-        while ((fgets(buffer, sizeof(buffer), collection) != NULL)) {
+    FILE * collection = fopen ("collection.txt", "r"); //open file for reading
+    while (!feof(collection)) { //continues reading until end of file
+        while ((fgets(buffer, sizeof(buffer), collection) != NULL)) { //adds line to buffer
             char *cur, link[BUFSIZE];
             cur = buffer;
-            while ((cur = nextURL(cur)) != NULL) {
-
-                getURL(cur, link, BUFSIZE - 1);
-                DLListAfter(URLs, link, 0, 0);
-                //showDLList(URLs);
-                //URLcount++;
-                //printf("%s, %d\n", link, URLcount);
+            while ((cur = nextURL(cur)) != NULL) { //jumps to characters "url" in line
+                getURL(cur, link, BUFSIZE - 1); //normalises url
+                DLListAfter(URLs, link, 0, 0); //add to list
                 cur += strlen(link);
             }
         }
     }
-    fclose(collection);
-    float URLcount = DLListLength(URLs);
-    double initPageRank = (1 / (float)URLcount);
-    //printf("initPageRank: %f\n", initPageRank); //FOR TESTING
-
-    for (i = 0; i <= URLcount; i++) {
+    fclose(collection); //close collection.txt
+    float URLcount = DLListLength(URLs); //gets amount of URLs
+    double initPageRank = (1 / (float)URLcount); //determines initial pagerank
+    for (i = 0; i <= URLcount; i++) { //this for loop sets all the pageranks to inital value
         DLListMoveTo(URLs, i + 1);
         alterpagerank (URLs, initPageRank);
-
     }
     return URLs;
 }
-
+//this function turn a linked list of URLs into a properly connected graph and calculates outward degree
 Graph makeGraph(DLList list) {
     int i;
     char buffer[BUFSIZE];
-    int URLcount = DLListLength(list);
-    Graph webPages = newGraph(URLcount);
+    int URLcount = DLListLength(list); //gets amount of URLs
+    Graph webPages = newGraph(URLcount); //creates empty graph
 
-    for (i = 0; i <= URLcount; i++) {
-        int degree = 0;
+    for (i = 0; i <= URLcount; i++) { //this for loop opens all the corresponding urlx.txt files and reads the URLs it connects to and adds edges in the graph for those links
+        int degree = 0; //initally degree set as 0
         DLListMoveTo(list, i + 1);
-        char * outgoingURL = DLListCurrent(list);
-        char * outgoingURLtext = stradd(outgoingURL, ".txt");
-        //printf("%s\n", outgoingURL); //FOR TESTING
-        FILE *f = fopen(outgoingURLtext, "r");
-        while ((fgets(buffer, sizeof(buffer), f) != NULL)) {
+        char * outgoingURL = DLListCurrent(list); //reads in url to open
+        char * outgoingURLtext = stradd(outgoingURL, ".txt"); //add .txt to urlx
+        FILE *f = fopen(outgoingURLtext, "r"); //opens url for reading
+        while ((fgets(buffer, sizeof(buffer), f) != NULL)) { //reads in line
             char *cur, link[BUFSIZE];
             cur = buffer;
-            while ((cur = nextURL(cur)) != NULL) {
-                getURL(cur, link, BUFSIZE - 1);
-                //printf("%s\n", link);
-                if (!isConnected(webPages, outgoingURL, link)) {
-                    addEdge(webPages, outgoingURL, link);
+            while ((cur = nextURL(cur)) != NULL) { //finds occurance if "url..."
+                getURL(cur, link, BUFSIZE - 1); //normalises url names
+                if (!isConnected(webPages, outgoingURL, link)) { //if it isn't already connected in the graph adds an edge
+                    addEdge(webPages, outgoingURL, link); //adds edges
+                    degree++; //increases degree
                 }
                 cur += strlen(link);
-                degree++;
-//create linked list with outgoing URLs with it's pagerank divided by number of outgoing URLs
             }
-
         }
-        //printf("degree: %d\n", degree); FOR TESTING
-        alterDegree(list, degree);
-        fclose(f);
+        alterDegree(list, degree); //sets degree as counted in loop
+        fclose(f); //close the file
     }
     return webPages;
 }
