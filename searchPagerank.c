@@ -10,7 +10,6 @@
 #include "DLList.h"
 
 void getUrlStr(char url[], char *str, int start);
-//DLList compLists(DLList a, DLList b);
 
 int main(int argc, char **argv) {
 	int i;
@@ -124,29 +123,3 @@ void getUrlStr(char url[], char *str, int start) {
 		}
 	}
 }
-/*
-DLList compLists(DLList a, DLList b) {
-	int i = 0;
-	int j = 0;
-
-	if (DLListIsEmpty(b)) {
-		return a;
-	}
-	DLList new = newDLList();
-	DLListMoveTo(a, 1);
-	DLListMoveTo(b, 1);
-	for (i = 0; i <= DLListLength(a); i++) {
-		for (j = 0; j <= DLListLength(b); j++) {
-			if (strcmp(DLListCurrent(a), DLListCurrent(b)) == 0) {
-				DLListAfter(new, DLListCurrent(a), 0, 0);
-				break;
-			}
-			DLListMove(b, 1);
-		}
-		DLListMove(a, 1);
-	}
-	freeDLList(a);
-	freeDLList(b);
-
-	return new;
-}*/

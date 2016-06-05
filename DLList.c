@@ -331,7 +331,7 @@ int DLListIsEmpty(DLList L)
 {
 	return (L->nitems == 0);
 }
-
+//function to print pageranks to file for pagerank.c
 void printToFileP (DLList L) {
 	assert(L != NULL);
 	FILE * outputFile = fopen("pagerankList.txt", "w");
@@ -339,7 +339,7 @@ void printToFileP (DLList L) {
 	for (curr = L->first; curr != NULL; curr = curr->next)
 		fprintf(outputFile, "%s, %d, %0.7f\n", curr->urlname, curr->degree, curr->pagerank);
 }
-
+//function to print TfiDf list to screen for searchTfIdf
 void printToScreenTfIdf (DLList L) {
 	assert(L != NULL);
 	DLListNode *curr;
@@ -347,7 +347,7 @@ void printToScreenTfIdf (DLList L) {
 	for (curr = L->first; curr != NULL && i <= 10; curr = curr->next, i++)
 		printf("%s %0.7f\n", curr->urlname, curr->pagerank);
 }
-
+//compares lists and returns common nodes
 DLList cmpLists(DLList a, DLList b) {
 	if (DLListIsEmpty(b)) {
 		return a;
@@ -371,7 +371,7 @@ DLList cmpLists(DLList a, DLList b) {
 
 	return new;
 }
-
+//function to order list by pagerank
 DLList orderByPagerank (DLList L) {
 	DLList new = newDLList();
 	//puts("hi");
@@ -421,7 +421,7 @@ DLList orderByPagerank (DLList L) {
 //printToScreenTfIdf(new);
 	return new;
 }
-
+//Not working
 DLList orderByDegreeAndDeleteDuplicates (DLList L) {
 	DLList new = newDLList();
 	//puts("hi");
@@ -464,26 +464,36 @@ DLList orderByDegreeAndDeleteDuplicates (DLList L) {
 
 		//printToScreenTfIdf(new);
 	}
-	char * Urlnames[DLListLength(L)];
-	for (i = 0; i < DLListLength(L); i++) {
-		DLListMoveTo(L, i + 1);
-		for (j = 0; j < DLListLength(L); j++) {
-			if (strcmp(DLListCurrent(L), Urlnames[j]) != 0) {
-				Urlnames[i] = DLListCurrent(L);
-			} else if (strcmp(DLListCurrent(L), Urlnames[j]) == 0) {
-				DLListDelete(L);
+
+//for (i = 0; i<DLListLength(new); i++) {
+//	DLListMoveTo(new, i + 1);
+
+//}
+	//DLList temp = newDLList();
+	showDLList(new);
+	char * Urlnames[DLListLength(new)];
+	for (i = 0; i < DLListLength(new); i++) {
+		DLListMoveTo(new, i + 1);
+		printf("1\n");
+		for (j = 0; j < DLListLength(new); j++) {
+			printf("2\n");
+			if (strcmp(DLListCurrent(new), Urlnames[j]) != 0) {
+				Urlnames[i] = DLListCurrent(new);
+			} else if (strcmp(DLListCurrent(new), Urlnames[j]) == 0) {
+				DLListDelete(new);
 			}
+			//	}
 		}
 	}
-	showDLList(L);
+	showDLList(new);
 
 
 
-	freeDLList(L);
+	//freeDLList(temp);
 //printToScreenTfIdf(new);
 	return new;
 }
-
+//function to check if next exists
 int isNext(DLList L) {
 	assert(L != NULL);
 	return (L->curr->next != NULL);

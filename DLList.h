@@ -76,14 +76,18 @@ int DLListIsEmpty(DLList);
 //print to pagerankList.txt
 void printToFileP (DLList);
 
+//function to print TfiDf list to screen for searchTfIdf
 void printToScreenTfIdf (DLList);
 
+//compares lists and returns common nodes
 DLList cmpLists(DLList a, DLList b);
 
+//function to order list by pagerank
 DLList orderByPagerank (DLList L);
 
 DLList orderByDegreeAndDeleteDuplicates (DLList L);
 
+//function to check if next exists
 int isNext(DLList L);
 
 #endif

@@ -39,26 +39,26 @@ int main (int argc, const char * argv[]) {
             n = DLListLength(mergedList);
         }
         if (argc == 3) {
-            puts("1");
+            //puts("1");
             char file1[50];// = malloc(sizeof(argv[1]));
-            puts("2");
+            //puts("2");
             strcpy(file1, argv[1]);
-            puts("3");
+            //puts("3");
             DLList listForFile1 = newDLList();
             listForFile1 = getListWithPosition(file1);
-            showDLList(listForFile1);
-            puts("");
+            //showDLList(listForFile1);
+            //puts("");
 
             char file2[50];// = malloc(sizeof(argv[2]));
             strcpy(file2, argv[2]);
             DLList listForFile2 = newDLList();
             listForFile2 = getListWithPosition(file2);
-            showDLList(listForFile2);
-            puts("");
+            //showDLList(listForFile2);
+            //puts("");
 
             n = getN(listForFile1, listForFile2);
             mergedList = makeMergedList(listForFile1, listForFile2);
-            showDLList(mergedList);
+            //showDLList(mergedList);
 
         }
         if (argc > 3) {
